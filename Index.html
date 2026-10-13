@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Bahasa Indonesia — Indonesian Language Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#9e1b24; --red-d:#6e0f17; --red-l:#c0343d;
+  --ink:#2b1a1c; --mute:#7a6467; --paper:#fffdfc; --cream:#fbf4f1;
+  --line:#ead8d4; --ok:#2f7d57;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);line-height:1.55;
+  background:radial-gradient(1200px 500px at 50% -10%,#fff 0,var(--cream) 70%) fixed}
+.top{background:var(--red);color:#fff;text-align:center;padding:13px 10px;
+  letter-spacing:.45em;font-size:.74rem;font-weight:600;text-indent:.45em}
+.wrap{max-width:780px;margin:0 auto;padding:34px 18px 30px}
+.card{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--red);
+  padding:44px 42px;box-shadow:0 30px 60px -35px rgba(110,15,23,.45)}
+.screen{display:none;animation:fade .45s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.serif{font-family:"Playfair Display",Georgia,serif}
+.en{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;color:var(--mute)}
+h1{font-family:"Playfair Display",Georgia,serif;font-weight:900;color:var(--red);
+  font-size:clamp(2.1rem,6.4vw,3.3rem);line-height:1.1;margin:0;text-align:center}
+.tag{font-size:1.3rem;text-align:center;margin:10px 0 0}
+.orn{display:flex;align-items:center;gap:14px;margin:26px auto;max-width:360px;color:var(--red)}
+.orn i{flex:1;height:1px;background:var(--red);opacity:.5}
+.orn b{font-size:.7rem}
+.lead{text-align:center;margin:0 auto;max-width:520px}
+.lead small{display:block;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:26px 0 8px}
+.chip{border:1px solid var(--line);padding:6px 12px;font-size:.78rem;background:#fff;color:var(--ink)}
+.chip em{font-family:"Cormorant Garamond",serif;color:var(--mute);font-size:.95rem}
+label.f{display:block;max-width:360px;margin:26px auto 0;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+label.f em{text-transform:none;letter-spacing:0;font-family:"Cormorant Garamond",serif;font-size:1rem}
+input[type=text]{width:100%;margin-top:6px;padding:12px 14px;border:1px solid var(--line);background:#fff;
+  font:inherit;font-size:1rem;color:var(--ink);outline:none;text-transform:none;letter-spacing:0}
+input[type=text]:focus{border-color:var(--red)}
+.center{text-align:center}
+.btn{display:inline-block;background:var(--red);color:#fff;border:1px solid var(--red);cursor:pointer;
+  padding:14px 34px;font:600 .8rem Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;transition:.2s}
+.btn small{display:block;margin-top:2px;font:italic 400 .95rem "Cormorant Garamond",serif;letter-spacing:.02em;text-transform:none;opacity:.9}
+.btn:hover{background:var(--red-d);border-color:var(--red-d)}
+.btn.ghost{background:#fff;color:var(--red)}
+.btn.ghost:hover{background:var(--cream)}
+.btn.big{margin-top:28px}
+/* quiz */
+.meta{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.count{font-family:"Playfair Display",serif;font-size:1.05rem;color:var(--red-d)}
+.count .en{font-size:1rem;margin-left:6px}
+.badges{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.badges span+span::before{content:"·";margin:0 8px;color:var(--red)}
+.progress{height:3px;background:var(--line);margin:12px 0 28px}
+.progress div{height:100%;width:0;background:var(--red);transition:width .4s ease}
+.q{font-family:"Playfair Display",Georgia,serif;font-size:clamp(1.15rem,3.6vw,1.45rem);line-height:1.45;margin:0 0 22px;color:var(--ink)}
+.opt{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1px solid var(--line);padding:13px 16px;margin:0 0 10px;cursor:pointer;font:inherit;color:inherit;transition:.18s}
+.opt:hover:not(:disabled){border-color:var(--red);background:#fff7f6}
+.opt:disabled{cursor:default}
+.ltr{flex:none;width:32px;height:32px;border:1.5px solid var(--red);border-radius:50%;display:grid;place-items:center;
+  font:700 .92rem "Playfair Display",serif;color:var(--red);margin-top:-2px}
+.opt.ok{border-color:var(--ok);background:#f2faf6}
+.opt.ok .ltr{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.no{border-color:var(--red);background:#fff1f1}
+.opt.no .ltr{background:var(--red);color:#fff}
+.opt.dim{opacity:.55}
+.fb{margin-top:18px;padding:16px 18px;background:var(--cream);border-left:4px solid var(--red)}
+.fb.good{border-color:var(--ok)}
+.fb h4{margin:0 0 4px;font:700 1rem "Playfair Display",serif}
+.fb h4 .en{font-size:1rem;font-weight:400}
+.fb p{margin:0;font-size:.93rem;color:#4a393b}
+.nextrow{text-align:right;margin-top:18px}
+/* result */
+.ring{width:190px;height:190px;margin:6px auto 0;border-radius:50%;border:6px solid var(--red);
+  display:grid;place-content:center;text-align:center;background:#fff;box-shadow:inset 0 0 0 6px #fff,inset 0 0 0 7px var(--line)}
+.ring b{font:900 4.6rem/1 "Playfair Display",serif;color:var(--red)}
+.ring span{font-size:.78rem;letter-spacing:.14em;color:var(--mute);margin-top:4px}
+.rank{font:700 1.7rem "Playfair Display",serif;color:var(--red-d);text-align:center;margin:22px 0 0}
+.stat{text-align:center;margin:16px 0 0}
+.stat small{display:block}
+.break{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:22px 0 4px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px}
+.review{margin-top:30px;border-top:1px solid var(--line);padding-top:8px}
+.ri{padding:16px 0;border-bottom:1px solid var(--line)}
+.ri .q{font-size:1.05rem;margin-bottom:8px}
+.ri p{margin:3px 0;font-size:.9rem}
+.mk{font-weight:600}
+.mk.g{color:var(--ok)} .mk.r{color:var(--red)}
+.foot{text-align:center;margin-top:26px;font-size:.82rem;letter-spacing:.18em;color:var(--mute);text-transform:uppercase}
+.foot b{color:var(--red-d);letter-spacing:.24em}
+.foot .hash{display:block;margin-top:4px;text-transform:none;letter-spacing:.06em;font-size:.95rem;color:var(--red);font-weight:600}
+[hidden]{display:none!important}
+@media(max-width:560px){.card{padding:30px 20px}.btn{padding:13px 24px}.ring{width:160px;height:160px}.ring b{font-size:3.8rem}}
+</style>
+</head>
+<body>
+<div class="top">WARTA_KATA</div>
+<div class="wrap">
+
+  <!-- ============ HALAMAN AWAL ============ -->
+  <section id="start" class="screen active card">
+    <h1>Kuis Bahasa Indonesia</h1>
+    <p class="tag en">The Indonesian Language Proficiency Challenge</p>
+    <div class="orn"><i></i><b>◆</b><i></i></div>
+    <p class="lead">Ukur seberapa tepat Anda berbahasa Indonesia: <span id="jml"></span> soal acak, pilihan ganda A–D, dari yang mudah hingga yang mengecoh.
+      <small class="en">Measure how precisely you command Indonesian — random questions, multiple choice, from easy to deceptive.</small></p>
+    <div class="chips">
+      <span class="chip">Kata Baku <em>Standard Words</em></span>
+      <span class="chip">Ejaan <em>Spelling</em></span>
+      <span class="chip">Tanda Baca <em>Punctuation</em></span>
+      <span class="chip">Makna Kata <em>Meaning</em></span>
+      <span class="chip">Kalimat Efektif <em>Effective Sentences</em></span>
+      <span class="chip">Pemakaian Sehari-hari <em>Everyday Usage</em></span>
+    </div>
+    <label class="f">Nama (opsional) <em>— Name, optional</em>
+      <input type="text" id="nama" maxlength="30" placeholder="Untuk dicetak pada gambar hasil" autocomplete="off">
+    </label>
+    <div class="center"><button class="btn big" id="mulai">Mulai Kuis<small>Begin the Quiz</small></button></div>
+  </section>
+
+  <!-- ============ HALAMAN SOAL ============ -->
+  <section id="quiz" class="screen card">
+    <div class="meta">
+      <div class="count">Soal <span id="no"></span> / <span id="total"></span><span class="en">Question</span></div>
+      <div class="badges"><span id="kat"></span><span id="lvl"></span></div>
+    </div>
+    <div class="progress"><div id="bar"></div></div>
+    <p class="q" id="soal"></p>
+    <div id="opsi"></div>
+    <div class="fb" id="fb" hidden>
+      <h4 id="fbJudul"></h4>
+      <p id="fbIsi"></p>
+    </div>
+    <div class="nextrow" id="nextrow" hidden>
+      <button class="btn" id="lanjut"></button>
+    </div>
+  </section>
+
+  <!-- ============ HALAMAN HASIL ============ -->
+  <section id="result" class="screen card">
+    <h1 style="font-size:clamp(1.7rem,5vw,2.4rem)">Hasil Akhir</h1>
+    <p class="tag en">Your Final Score</p>
+    <div class="orn"><i></i><b>◆</b><i></i></div>
+    <p class="center en" id="atasNama" style="margin:0 0 14px;font-size:1.2rem" hidden></p>
+    <div class="ring"><b id="nilai">0</b><span>DARI 100 · OUT OF 100</span></div>
+    <p class="rank" id="peringkat"></p>
+    <p class="en center" id="peringkatEn" style="margin:0;font-size:1.2rem"></p>
+    <p class="stat" id="benar"></p>
+    <div class="break" id="rincian"></div>
+    <div class="actions">
+      <button class="btn" id="simpan">Simpan sebagai Gambar<small>Save as Image</small></button>
+      <button class="btn ghost" id="tinjau">Tinjau Jawaban<small>Review Answers</small></button>
+      <button class="btn ghost" id="ulang">Main Lagi<small>Play Again</small></button>
+    </div>
+    <div class="review" id="review" hidden></div>
+  </section>
+
+  <div class="foot">Oleh <b>WARTA_KATA</b><span class="hash">#cintabahasaindonesia</span></div>
+</div>
+
+
+<!-- ======================================================================
+  BANK SOAL — BAGIAN YANG ANDA EDIT DI VS CODE
+  ----------------------------------------------------------------------
+  Format satu soal:
+    Q("Kategori", Tingkat, "Teks soal", ["JAWABAN BENAR", "salah 1", "salah 2", "salah 3"], "Pembahasan");
+
+  • Tingkat : 1 = mudah, 2 = sedang, 3 = sulit
+  • Pilihan PERTAMA di dalam [ ] SELALU jawaban yang benar.
+    Urutan A/B/C/D diacak otomatis saat kuis, jadi tidak perlu diatur.
+  • Teks soal & pilihan boleh memakai HTML: <b>tebal</b>, <i>miring</i>, <u>garis bawah</u>.
+  • Tanda kutip ganda di dalam teks ditulis \"  (atau pakai “ ” saja).
+  • Untuk menambah soal: salin satu baris Q(...) lalu ubah isinya.
+  • Jumlah soal per kuis dan komposisi tingkat kesulitan diatur di KONFIGURASI.
+====================================================================== -->
+<script>
+const KONFIGURASI = {
+  jumlahSoal: 10,                    // soal per sesi kuis
+  komposisi: { 1: 3, 2: 4, 3: 3 },   // jumlah soal mudah / sedang / sulit per sesi
+  tampilkanPembahasan: true          // false = tidak menampilkan penjelasan setelah menjawab
+};
+
+const BANK = [];
+const Q = (k, t, q, o, e) => BANK.push({ k, t, q, o, e: e || "" });
+
+/* ---------------------------- KATA BAKU ---------------------------- */
+Q("Kata Baku",1,"Penulisan kata baku yang benar ialah ...",["apotek","apotik","apotheek","apotex"],"Bentuk baku dalam KBBI: <b>apotek</b>.");
+Q("Kata Baku",1,"Bentuk baku dari kata berikut ialah ...",["analisis","analisa","analisys","analis-is"],"Serapan dari <i>analysis</i>; bentuk bakunya <b>analisis</b>.");
+Q("Kata Baku",1,"Penulisan kata baku yang benar ialah ...",["izin","ijin","idzin","ijien"],"Bunyi /z/ dipertahankan: <b>izin</b>.");
+Q("Kata Baku",2,"Tanda terima pembayaran disebut ...",["kuitansi","kwitansi","quitansi","kuwitansi"],"Bentuk baku: <b>kuitansi</b>.");
+Q("Kata Baku",1,"Bentuk baku yang benar ialah ...",["sistem","sistim","sisthem","sistém"],"Baku: <b>sistem</b>.");
+Q("Kata Baku",2,"Kata baku untuk 'petuah, anjuran yang baik' ialah ...",["nasihat","nasehat","nasihad","nasehad"],"Baku: <b>nasihat</b>.");
+Q("Kata Baku",1,"Penulisan kata baku yang benar ialah ...",["objek","obyek","objeg","obejk"],"Baku: <b>objek</b>.");
+Q("Kata Baku",2,"Bentuk baku dari kata yang bermakna 'akibat yang kurang menyenangkan' ialah ...",["risiko","resiko","riziko","resico"],"Baku: <b>risiko</b>.");
+Q("Kata Baku",2,"Kalimat yang memakai kata baku dengan tepat ialah ...",["Ia datang sekadar menyapa.","Ia datang sekedar menyapa.","Ia datang sekader menyapa.","Ia datang sekedhar menyapa."],"Baku: <b>sekadar</b>.");
+Q("Kata Baku",2,"Dokter itu membuka ___ mandiri di rumahnya.",["praktik","praktek","praktis","praktikum"],"<b>Praktik</b> adalah bentuk baku; <i>praktek</i> tidak baku.");
+Q("Kata Baku",1,"Kata baku untuk ajakan sopan 'persilakan' ialah ...",["silakan","silahkan","sillakan","silaken"],"Dasar katanya <i>sila</i>, sehingga bentuk bakunya <b>silakan</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["asas","azas","asaz","assas"],"Baku: <b>asas</b> (dasar, prinsip).");
+Q("Kata Baku",2,"Baju dalam berlengan pendek disebut ...",["kaus","kaos","kous","kaoz"],"Baku: <b>kaus</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["hakikat","hakekat","hakikad","hakiqat"],"Baku: <b>hakikat</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["karier","karir","kareir","kariyer"],"Baku: <b>karier</b>.");
+Q("Kata Baku",2,"Bentuk baku untuk 'dapat diandalkan' ialah ...",["andal","handal","andhal","hendal"],"Baku: <b>andal</b>. <i>Handal</i> tidak baku (hiperkorek).");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["ekstrem","ekstrim","ekstreem","extrem"],"Baku: <b>ekstrem</b>.");
+Q("Kata Baku",1,"Bentuk baku yang benar ialah ...",["frekuensi","frekwensi","frekuwensi","frequensi"],"Baku: <b>frekuensi</b>.");
+Q("Kata Baku",2,"Bentuk baku dari 'berbaris menunggu giliran' ialah ...",["antre","antri","antere","ngantre"],"Baku: <b>antre</b>.");
+Q("Kata Baku",3,"Bentuk baku untuk 'agak basah' ialah ...",["lembap","lembab","lemmbap","lembaap"],"KBBI: <b>lembap</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["salat","shalat","sholat","salath"],"Baku: <b>salat</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["napas","nafas","nafaz","napaz"],"Baku: <b>napas</b>.");
+Q("Kata Baku",2,"Ia berusaha ___ nasibnya.",["mengubah","merubah","merobah","mengubahkan"],"Kata dasar <i>ubah</i> + meng- = <b>mengubah</b>.");
+Q("Kata Baku",3,"Cuaca buruk ___ hasil panen petani.",["memengaruhi","mempengaruhi","memperngaruhi","memangaruhi"],"Kata dasar <i>pengaruh</i>: /p/ luluh menjadi <b>memengaruhi</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["November","Nopember","Novembre","Novenber"],"Baku: <b>November</b>.");
+Q("Kata Baku",2,"Lawan kata 'abstrak' yang ditulis baku ialah ...",["konkret","kongkrit","konkrit","kongkret"],"Baku: <b>konkret</b>.");
+Q("Kata Baku",1,"Penulisan nama hari yang baku ialah ...",["Jumat","Jum'at","Jumaat","Jumad"],"Baku: <b>Jumat</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["terampil","trampil","tarampil","terrampil"],"Baku: <b>terampil</b>.");
+Q("Kata Baku",2,"Dugaan sementara dalam penelitian disebut ...",["hipotesis","hipotesa","hipotessis","hypotesis"],"Baku: <b>hipotesis</b>.");
+Q("Kata Baku",2,"Bentuk baku yang benar ialah ...",["aktivitas","aktifitas","aktivites","aktipitas"],"Baku: <b>aktivitas</b>.");
+Q("Kata Baku",3,"Bentuk baku untuk 'teliti, cermat' ialah ...",["saksama","seksama","sakssama","seksamah"],"Dalam KBBI bentuk baku: <b>saksama</b>.");
+Q("Kata Baku",2,"Penulisan baku hari raya umat Islam ialah ...",["Idulfitri","Idul Fitri","Iedul Fitri","Idhul Fitri"],"KBBI: <b>Idulfitri</b> dan <b>Iduladha</b> (serangkai).");
+Q("Kata Baku",1,"Jasad orang yang telah meninggal ditulis baku ...",["jenazah","jenasah","jenazat","genazah"],"Baku: <b>jenazah</b>.");
+Q("Kata Baku",3,"Penulisan baku nama aliran dalam fikih ialah ...",["mazhab","madzhab","mazhap","madhab"],"Baku: <b>mazhab</b>.");
+Q("Kata Baku",1,"Bentuk baku yang benar ialah ...",["telepon","telpon","teleppon","telefon"],"Baku: <b>telepon</b>.");
+
+/* ------------------------------ EJAAN ------------------------------ */
+Q("Ejaan",1,"Penulisan kata depan yang tepat terdapat pada kalimat ...",["Ia pergi ke pasar bersama ibunya.","Ia pergi kepasar bersama ibunya.","Ia pergi ke-pasar bersama ibunya.","Ia pergi ke pasar bersama ibu-nya."],"Kata depan <i>ke</i> ditulis terpisah dari kata yang mengikutinya.");
+Q("Ejaan",1,"Kalimat tanya dengan penulisan yang tepat ialah ...",["Di mana kamu menyimpan berkasnya?","Dimana kamu menyimpan berkasnya?","Di-mana kamu menyimpan berkasnya?","Dimana-kah kamu menyimpan berkasnya?"],"Kata tanya <b>di mana</b> dan <b>ke mana</b> ditulis terpisah.");
+Q("Ejaan",2,"Penulisan yang tepat ialah ...",["Dokumen itu sudah ditandatangani direktur.","Dokumen itu sudah ditanda tangani direktur.","Dokumen itu sudah di tandatangani direktur.","Dokumen itu sudah di tanda tangani direktur."],"Bentuk berimbuhan <i>di-...-i</i> ditulis serangkai: <b>ditandatangani</b>.");
+Q("Ejaan",2,"Penulisan partikel <i>pun</i> yang benar ialah ...",["Siapa pun yang datang akan disambut.","Siapapun yang datang akan disambut.","Siapa-pun yang datang akan disambut.","Sia pun yang datang akan disambut."],"Partikel <i>pun</i> ditulis terpisah, kecuali pada konjungsi seperti <i>walaupun</i>, <i>meskipun</i>.");
+Q("Ejaan",3,"Penulisan konjungsi yang benar ialah ...",["bagaimanapun","bagaimana pun","bagai manapun","bagaimana-pun"],"<b>Bagaimanapun</b>, <b>walaupun</b>, <b>meskipun</b>, <b>kendatipun</b> ditulis serangkai.");
+Q("Ejaan",2,"Penulisan nilai mata uang yang tepat ialah ...",["Rp5.000,00","Rp. 5.000,00","Rp 5,000.00","Rp.5000,00"],"Lambang <i>Rp</i> tanpa titik dan tanpa spasi; titik untuk ribuan, koma untuk desimal.");
+Q("Ejaan",2,"Penulisan keterangan waktu yang tepat ialah ...",["pukul 09.30","pukul 09,30","pukul 09-30","pukul 09/30"],"Titik dipakai untuk memisahkan jam, menit, dan detik.");
+Q("Ejaan",2,"Kalimat yang tidak diawali angka ialah ...",["Lima belas siswa mengikuti lomba itu.","15 siswa mengikuti lomba itu.","15 (lima belas) siswa mengikuti lomba itu.","Siswa 15 mengikuti lomba itu."],"Angka tidak dipakai pada awal kalimat; tulis dengan huruf atau susun ulang kalimat.");
+Q("Ejaan",2,"Penggunaan huruf kapital yang benar terdapat pada ...",["Kami bangga menjadi bangsa Indonesia.","Kami bangga menjadi Bangsa Indonesia.","Kami bangga menjadi bangsa indonesia.","Kami bangga menjadi Bangsa indonesia."],"Nama bangsa dikapitalkan (<i>Indonesia</i>), tetapi nama jenis <i>bangsa</i> tidak.");
+Q("Ejaan",2,"Penggunaan huruf kapital yang benar terdapat pada ...",["Gubernur Jawa Timur meresmikan jembatan itu.","Gubernur jawa timur meresmikan jembatan itu.","gubernur Jawa Timur meresmikan jembatan itu.","Gubernur Jawa timur meresmikan jembatan itu."],"Jabatan yang diikuti nama tempat sebagai bagian jabatan dikapitalkan.");
+Q("Ejaan",2,"Penulisan yang tepat ialah ...",["se-Indonesia","seIndonesia","se Indonesia","Se-indonesia"],"Awalan <i>se-</i> dengan huruf kapital diberi tanda hubung.");
+Q("Ejaan",2,"Penulisan unsur terikat yang tepat ialah ...",["pascasarjana","pasca sarjana","pasca-sarjana","pasca_sarjana"],"<i>Pasca-</i> adalah unsur terikat, ditulis serangkai dengan kata dasar.");
+Q("Ejaan",2,"Kalimat dengan penulisan yang tepat ialah ...",["Kedua negara menjalin kerja sama di bidang energi.","Kedua negara menjalin kerjasama di bidang energi.","Kedua negara menjalin kerja-sama di bidang energi.","Kedua negara menjalin kerjasama dibidang energi."],"<b>Kerja sama</b> ditulis terpisah; <i>di bidang</i> juga terpisah.");
+Q("Ejaan",2,"Penulisan yang tepat ialah ...",["bertanggung jawab","bertanggungjawab","bertanggung-jawab","ber tanggung jawab"],"Gabungan kata <i>tanggung jawab</i> ditulis terpisah.");
+Q("Ejaan",1,"Penulisan ucapan yang tepat ialah ...",["terima kasih","terimakasih","terima-kasih","terimah kasih"],"<b>Terima kasih</b> terdiri atas dua kata.");
+Q("Ejaan",1,"Kalimat dengan penulisan yang tepat ialah ...",["Kakak lebih rajin daripada adik.","Kakak lebih rajin dari pada adik.","Kakak lebih rajin dari-pada adik.","Kakak lebih rajin dripada adik."],"Kata <b>daripada</b> ditulis serangkai.");
+Q("Ejaan",1,"Penulisan yang tepat ialah ...",["Ia duduk di antara kedua sahabatnya.","Ia duduk diantara kedua sahabatnya.","Ia duduk di-antara kedua sahabatnya.","Ia duduk di antarakedua sahabatnya."],"<i>di</i> sebagai kata depan ditulis terpisah: <b>di antara</b>.");
+Q("Ejaan",2,"Penulisan yang tepat ialah ...",["antarkota","antar kota","antar-kota","antar_kota"],"<i>Antar-</i> adalah unsur terikat: <b>antarkota</b>, <b>antarnegara</b>.");
+Q("Ejaan",1,"Penulisan kata ulang yang tepat ialah ...",["Buku-buku itu tertata rapi.","Buku2 itu tertata rapi.","Buku buku itu tertata rapi.","Bukubuku itu tertata rapi."],"Kata ulang ditulis lengkap dengan tanda hubung.");
+Q("Ejaan",2,"Penulisan bilangan tingkat yang tepat ialah ...",["abad ke-20","abad ke 20","abad ke20","abad k-20"],"<i>ke-</i> pada bilangan tingkat memakai tanda hubung.");
+Q("Ejaan",2,"Dalam teks ilmiah, kata asing seperti <i>feedback</i> dituliskan dengan huruf ...",["miring","kapital semua","tebal","berwarna merah"],"Kata dan ungkapan asing dicetak miring.");
+
+/* ---------------------------- TANDA BACA ---------------------------- */
+Q("Tanda Baca",1,"Kalimat dengan tanda baca yang tepat ialah ...",["Ibu membeli apel, jeruk, dan salak.","Ibu membeli apel jeruk dan salak.","Ibu membeli: apel, jeruk, dan salak.","Ibu membeli apel; jeruk; dan salak."],"Rincian diberi koma. Titik dua tidak dipakai jika rincian melengkapi predikat.");
+Q("Tanda Baca",2,"Kalimat dengan tanda baca yang tepat ialah ...",["Ia rajin, tetapi nilainya belum memuaskan.","Ia rajin tetapi, nilainya belum memuaskan.","Ia rajin; tetapi nilainya belum memuaskan.","Ia rajin. tetapi nilainya belum memuaskan."],"Koma ditempatkan <b>sebelum</b> <i>tetapi</i>.");
+Q("Tanda Baca",2,"Kalimat dengan tanda baca yang tepat ialah ...",["Jika hujan, kami tetap berangkat.","Jika hujan kami tetap berangkat.","Jika, hujan kami tetap berangkat.","Jika hujan; kami tetap berangkat."],"Anak kalimat yang mendahului induk kalimat dipisah koma.");
+Q("Tanda Baca",2,"Kalimat dengan tanda baca yang tepat ialah ...",["Kami tetap berangkat jika hujan.","Kami tetap berangkat, jika hujan.","Kami tetap berangkat; jika hujan.","Kami tetap berangkat: jika hujan."],"Anak kalimat yang mengiringi induk kalimat tidak didahului koma.");
+Q("Tanda Baca",2,"Kalimat dengan tanda baca yang tepat ialah ...",["Namun, ia tetap hadir.","Namun ia, tetap hadir.","Namun; ia tetap hadir.","Namun: ia tetap hadir."],"Konjungtor antarkalimat di awal kalimat diikuti koma.");
+Q("Tanda Baca",3,"Kalimat tanya tak langsung yang bertanda baca tepat ialah ...",["Ia bertanya apakah kami sudah makan.","Ia bertanya apakah kami sudah makan?","Ia bertanya, apakah kami sudah makan?","Ia bertanya: apakah kami sudah makan?"],"Kalimat tanya tak langsung berstatus kalimat berita, diakhiri titik.");
+Q("Tanda Baca",3,"Judul karangan yang ditulis dengan benar ialah ...",["Pentingnya Membaca bagi Generasi Muda","Pentingnya Membaca Bagi Generasi Muda.","Pentingnya membaca bagi generasi muda.","PENTINGNYA MEMBACA, BAGI GENERASI MUDA."],"Judul tidak diakhiri titik; kata tugas seperti <i>bagi</i> tidak dikapitalkan.");
+Q("Tanda Baca",2,"Untuk memisahkan klausa setara tanpa konjungsi, dipakai tanda ...",["titik koma (;)","titik dua (:)","tanda hubung (-)","tanda tanya (?)"],"Titik koma memisahkan bagian kalimat yang sejenis dan setara.");
+Q("Tanda Baca",1,"Penulisan tempat dan tanggal surat yang tepat ialah ...",["Makassar, 17 Agustus 2026","Makassar. 17 Agustus 2026","Makassar: 17 Agustus 2026","Makassar - 17 Agustus 2026"],"Nama tempat dan tanggal dipisahkan koma.");
+Q("Tanda Baca",3,"Penulisan yang tepat ialah ...",["di-PHK-kan","diPHKkan","di PHK kan","di-phk-kan"],"Tanda hubung merangkai imbuhan dengan singkatan huruf kapital.");
+Q("Tanda Baca",1,"Tanda petik ganda dipakai untuk mengapit ...",["petikan langsung","kata berimbuhan","angka romawi","nama kota"],"Tanda petik mengapit petikan langsung dari pembicaraan atau tulisan lain.");
+Q("Tanda Baca",3,"Kalimat dengan tanda baca yang tepat ialah ...",["Kata Ibu, \"Pulanglah sebelum magrib.\"","Kata Ibu \"Pulanglah sebelum magrib\".","Kata Ibu: \"pulanglah sebelum magrib\".","Kata Ibu, \"pulanglah sebelum magrib\"."],"Sebelum petikan langsung ada koma; huruf awal petikan kapital; titik di dalam tanda petik.");
+Q("Tanda Baca",1,"Tanda baca yang tepat: <i>Betapa indahnya pemandangan ini__</i>",["!","?",";",","],"Kalimat seru diakhiri tanda seru.");
+
+/* ---------------------------- MAKNA KATA ---------------------------- */
+Q("Makna Kata",1,"Makna kata <i>lugas</i> ialah ...",["apa adanya, tidak berbelit-belit","berlebihan","bersifat rahasia","penuh perumpamaan"],"<b>Lugas</b>: langsung ke pokok, tanpa berbelit.");
+Q("Makna Kata",2,"Makna kata <i>anomali</i> ialah ...",["penyimpangan dari yang biasa","kebiasaan yang diulang","keseragaman","kesalahan ketik"],"<b>Anomali</b>: penyimpangan atau keganjilan dari keadaan normal.");
+Q("Makna Kata",2,"Makna kata <i>hegemoni</i> ialah ...",["pengaruh dominan satu pihak atas pihak lain","persekutuan dagang","pembagian kekuasaan merata","perjanjian damai"],"<b>Hegemoni</b>: dominasi pengaruh kepemimpinan.");
+Q("Makna Kata",3,"Makna kata <i>ihwal</i> ialah ...",["hal; perihal","kebiasaan lama","asal-usul keluarga","nama panggilan"],"<b>Ihwal</b>: hal, perihal; <i>ihwal pendidikan</i> = tentang pendidikan.");
+Q("Makna Kata",2,"Makna kata <i>niscaya</i> ialah ...",["pasti; tentu","mustahil","mungkin","semoga"],"<b>Niscaya</b>: pasti, tidak diragukan lagi.");
+Q("Makna Kata",3,"Dalam frasa <i>uang lancung</i>, kata <i>lancung</i> bermakna ...",["palsu; tidak jujur","licin","berani","hilang"],"<b>Lancung</b>: tidak jujur; palsu.");
+Q("Makna Kata",3,"Makna kata <i>parau</i> untuk suara ialah ...",["serak","nyaring","merdu","lantang"],"<b>Parau</b>: serak (suara).");
+Q("Makna Kata",3,"Dalam <i>rapat paripurna</i>, kata <i>paripurna</i> bermakna ...",["lengkap; dihadiri seluruh anggota","tertutup","tertunda","darurat"],"<b>Paripurna</b>: lengkap, penuh; rapat yang dihadiri semua anggota.");
+Q("Makna Kata",2,"Makna kata <i>sporadis</i> ialah ...",["terjadi sesekali dan tidak merata","menyebar merata","terus-menerus","terjadi serentak"],"<b>Sporadis</b>: kadang-kadang; terjadi di sana-sini.");
+Q("Makna Kata",2,"Makna kata <i>moratorium</i> ialah ...",["penangguhan atau penghentian sementara","pengesahan","pembatalan permanen","pembebasan pajak"],"<b>Moratorium</b>: penangguhan sementara suatu kegiatan atau kewajiban.");
+Q("Makna Kata",2,"Makna kata <i>implisit</i> ialah ...",["tersirat","terang-terangan","berlebihan","sementara"],"<b>Implisit</b>: terkandung tetapi tidak dinyatakan langsung; lawannya <i>eksplisit</i>.");
+Q("Makna Kata",3,"Makna kata <i>prerogatif</i> ialah ...",["hak istimewa yang dimiliki pejabat tertentu","hak memilih","kewajiban umum","tugas keagamaan"],"<b>Prerogatif</b>: hak istimewa yang melekat pada jabatan tertentu.");
+Q("Makna Kata",3,"Makna kata <i>mafhum</i> ialah ...",["paham; mengerti","bingung","marah","takut"],"<b>Mafhum</b>: paham, mengerti.");
+Q("Makna Kata",2,"Makna kata <i>nirlaba</i> ialah ...",["tidak bertujuan mencari laba","untung besar","rugi","bunga tetap"],"<b>Nirlaba</b>: tidak mencari keuntungan.");
+Q("Makna Kata",1,"Makna kata <i>kendala</i> ialah ...",["hambatan","tujuan","keberhasilan","hadiah"],"<b>Kendala</b>: halangan atau rintangan.");
+Q("Makna Kata",2,"Makna kata <i>gamblang</i> ialah ...",["jelas; terang","tersembunyi","rumit","gelap"],"<b>Gamblang</b>: jelas dan terang.");
+Q("Makna Kata",1,"Makna kata <i>mutakhir</i> ialah ...",["terbaru","terdahulu","tertinggal","terkecil"],"<b>Mutakhir</b>: terbaru, paling baru.");
+Q("Makna Kata",3,"Makna kata <i>takzim</i> ialah ...",["hormat; sopan","takut","gembira","iri"],"<b>Takzim</b>: hormat dengan sopan santun.");
+Q("Makna Kata",2,"Makna kata <i>arif</i> ialah ...",["bijaksana","kikir","angkuh","malas"],"<b>Arif</b>: bijaksana, cerdik pandai.");
+Q("Makna Kata",3,"Makna kata <i>menilik</i> ialah ...",["melihat dengan saksama; menjenguk","menjahit","menyelam","menempa"],"<b>Tilik</b>: melihat dengan saksama; memeriksa.");
+Q("Makna Kata",3,"Makna kata <i>anjangsana</i> ialah ...",["kunjungan silaturahmi","perjalanan jauh","pesta rakyat","upacara adat"],"<b>Anjangsana</b>: kunjungan kepada kerabat atau tetangga.");
+Q("Makna Kata",2,"Makna kata <i>kelakar</i> ialah ...",["senda gurau","kekesalan","kemarahan","sindiran"],"<b>Kelakar</b>: lelucon, senda gurau.");
+Q("Makna Kata",3,"Makna <i>bertungkus lumus</i> ialah ...",["bekerja sangat keras","bermalas-malasan","berselisih","bersembunyi"],"<b>Bertungkus lumus</b>: bekerja dengan sungguh-sungguh dan sibuk.");
+Q("Makna Kata",2,"Makna kata <i>abstain</i> ialah ...",["tidak memberikan suara","menolak mentah-mentah","menyetujui","menunda sidang"],"<b>Abstain</b>: tidak memberikan suara dalam pemungutan suara.");
+Q("Makna Kata",2,"Makna kata <i>resiprokal</i> ialah ...",["timbal balik","sepihak","ragu-ragu","bergantian"],"<b>Resiprokal</b>: berbalasan, timbal balik.");
+Q("Makna Kata",1,"Kalimat yang dapat ditafsirkan dua arah disebut bersifat ...",["ambigu","lugas","tegas","hemat"],"<b>Ambigu</b>: bermakna ganda.");
+Q("Makna Kata",2,"Makna kata <i>hakiki</i> ialah ...",["sebenarnya; sejati","palsu","sementara","lahiriah"],"<b>Hakiki</b>: yang sebenarnya.");
+Q("Makna Kata",3,"Praktik itu sudah <i>jamak</i> di kalangan pedagang. Kata <i>jamak</i> bermakna ...",["lazim; banyak terjadi","aneh","dilarang","baru"],"<b>Jamak</b>: banyak; dalam konteks ini, lazim.");
+Q("Makna Kata",2,"Makna kata <i>kudapan</i> ialah ...",["makanan kecil; camilan","makan besar","minuman keras","bumbu dapur"],"<b>Kudapan</b>: makanan ringan.");
+Q("Makna Kata",2,"Makna kata <i>pelesir</i> ialah ...",["bertamasya","bekerja","menyelam","belajar"],"<b>Pelesir</b>: pesiar, bertamasya.");
+Q("Makna Kata",2,"Makna kata <i>purnawirawan</i> ialah ...",["prajurit atau perwira yang telah pensiun","prajurit baru","pejabat sipil","relawan"],"<b>Purnawirawan</b>: anggota militer yang sudah purnatugas.");
+Q("Makna Kata",2,"Makna kata <i>fatamorgana</i> ialah ...",["gambaran semu akibat pembiasan cahaya","hujan es","cahaya kutub","gerhana"],"<b>Fatamorgana</b>: bayangan semu, juga kiasan untuk harapan kosong.");
+Q("Makna Kata",3,"Makna kata <i>paradoks</i> ialah ...",["pernyataan yang tampak bertentangan tetapi mengandung kebenaran","persamaan pendapat","kesepakatan bersama","jawaban yang benar"],"<b>Paradoks</b>: seolah-olah bertentangan, tetapi mengandung kebenaran.");
+
+/* -------------------------- KALIMAT EFEKTIF -------------------------- */
+Q("Kalimat Efektif",1,"Kalimat yang efektif ialah ...",["Hadirin dimohon berdiri.","Para hadirin dimohon berdiri.","Para hadirin sekalian dimohon berdiri.","Hadirin yang hadir dimohon berdiri."],"<i>Hadirin</i> sudah bermakna jamak; <i>para</i> dan <i>sekalian</i> berlebihan.");
+Q("Kalimat Efektif",1,"Kalimat yang efektif ialah ...",["Siswa itu maju untuk menerima piala.","Siswa itu maju ke depan untuk menerima piala.","Siswa itu naik maju ke depan untuk menerima piala.","Siswa itu maju-maju ke depan untuk menerima piala."],"<i>Maju</i> sudah berarah ke depan; <i>ke depan</i> adalah pleonasme.");
+Q("Kalimat Efektif",2,"Kalimat yang memiliki subjek jelas ialah ...",["Siswa yang terlambat dilarang masuk.","Bagi siswa yang terlambat dilarang masuk.","Kepada siswa yang terlambat dilarang masuk.","Pada siswa yang terlambat dilarang masuk."],"Preposisi di depan subjek menghilangkan subjek kalimat.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Hal itu disebabkan oleh kelalaian petugas.","Hal itu disebabkan karena kelalaian petugas.","Hal itu disebabkan dikarenakan kelalaian petugas.","Hal itu disebabkan akibat kelalaian petugas."],"Gunakan <i>disebabkan oleh</i> atau cukup <i>karena</i>, bukan keduanya.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Menurut Pak Camat, jalan itu akan diperbaiki bulan depan.","Menurut Pak Camat mengatakan bahwa jalan itu akan diperbaiki bulan depan.","Menurut Pak Camat menyatakan jalan itu akan diperbaiki bulan depan.","Berdasarkan menurut Pak Camat jalan itu diperbaiki bulan depan."],"<i>Menurut</i> sudah menunjukkan sumber; jangan digandengkan dengan <i>mengatakan</i>.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Rumah tempat ia dibesarkan sudah dijual.","Rumah di mana ia dibesarkan sudah dijual.","Rumah yang mana ia dibesarkan sudah dijual.","Rumah dimana ia dibesarkan sudah dijual."],"<i>Di mana</i> dan <i>yang mana</i> bukan penghubung klausa; gunakan <i>tempat</i>.");
+Q("Kalimat Efektif",2,"Kalimat dengan pola kesejajaran yang tepat ialah ...",["Hobinya membaca, menulis, dan berenang.","Hobinya membaca, menulis, dan renang.","Hobinya membaca, penulisan, dan berenang.","Hobinya membaca, menulis, dan olahraga renang."],"Unsur yang diperinci harus sejenis: semuanya verba.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Meskipun lelah, ia tetap menyelesaikan tugasnya.","Meskipun lelah, tetapi ia tetap menyelesaikan tugasnya.","Walaupun lelah, namun ia tetap menyelesaikan tugasnya.","Meski lelah, akan tetapi ia tetap menyelesaikan tugasnya."],"Konjungsi <i>meskipun</i> tidak dipasangkan dengan <i>tetapi</i> atau <i>namun</i>.");
+Q("Kalimat Efektif",1,"Kalimat yang efektif ialah ...",["Ia belajar giat agar lulus ujian.","Ia belajar giat agar supaya lulus ujian.","Ia belajar giat demi untuk lulus ujian.","Ia belajar giat guna untuk lulus ujian."],"<i>Agar supaya</i> dan <i>demi untuk</i> adalah pleonasme.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Bahasa Indonesia merupakan bahasa persatuan.","Bahasa Indonesia adalah merupakan bahasa persatuan.","Bahasa Indonesia ialah merupakan bahasa persatuan.","Bahasa Indonesia adalah juga merupakan bahasa persatuan."],"Pilih salah satu: <i>adalah</i> atau <i>merupakan</i>.");
+Q("Kalimat Efektif",1,"Kalimat yang efektif ialah ...",["Pemandangan itu sangat indah.","Pemandangan itu sangat indah sekali.","Pemandangan itu amat sangat indah sekali.","Pemandangan itu indah sekali sangat."],"<i>Sangat</i> dan <i>sekali</i> tidak dipakai bersamaan.");
+Q("Kalimat Efektif",3,"Kalimat yang efektif ialah ...",["Karena rajin berlatih, tim itu menjuarai kompetisi.","Karena rajin berlatih, sehingga tim itu menjuarai kompetisi.","Oleh karena rajin berlatih, sehingga tim itu menjuarai kompetisi.","Sebab rajin berlatih, karena itu tim itu menjuarai kompetisi."],"Dua penanda sebab-akibat sekaligus membuat kalimat tidak hemat dan tidak logis.");
+Q("Kalimat Efektif",1,"Kalimat yang efektif ialah ...",["Para guru mengadakan rapat.","Para guru-guru mengadakan rapat.","Guru-guru para mengadakan rapat.","Para-para guru mengadakan rapat."],"<i>Para</i> sudah menyatakan jamak; tidak perlu diulang.");
+Q("Kalimat Efektif",3,"Berikut yang merupakan kalimat lengkap (bukan fragmen) ialah ...",["Pemerintah menaikkan tarif listrik mulai bulan depan.","Pemerintah yang menaikkan tarif listrik mulai bulan depan.","Kenaikan tarif listrik oleh pemerintah mulai bulan depan.","Tarif listrik yang akan dinaikkan pemerintah mulai bulan depan."],"Hanya pilihan ini yang memiliki subjek dan predikat; yang lain berupa frasa.");
+Q("Kalimat Efektif",2,"Kalimat yang efektif ialah ...",["Warga saling menolong saat banjir.","Warga saling tolong-menolong saat banjir.","Warga saling bantu-membantu saat banjir.","Warga saling menolong-nolong saat banjir."],"<i>Saling</i> sudah bermakna berbalasan; tidak perlu kata ulang resiprokal.");
+
+/* ----------------------------- SEHARI-HARI ----------------------------- */
+Q("Sehari-hari",1,"Pada pukul 13.00, sapaan yang paling lazim ialah ...",["Selamat siang","Selamat pagi","Selamat sore","Selamat malam"],"Kira-kira pukul 11.00–15.00 dipakai <i>selamat siang</i>.");
+Q("Sehari-hari",1,"Penulisan kata ganti sapaan yang tepat dalam surat resmi ialah ...",["Apakah Anda sudah mengisi formulir?","Apakah anda sudah mengisi formulir?","Apakah ANDA sudah mengisi formulir?","Apakah “anda” sudah mengisi formulir?"],"Kata ganti <i>Anda</i> ditulis dengan huruf awal kapital.");
+Q("Sehari-hari",2,"Penulisan yang tepat ialah ...",["Kita bersyukur atas nikmat-Nya.","Kita bersyukur atas nikmat-nya.","Kita bersyukur atas nikmat Nya.","Kita bersyukur atas nikmatNya."],"Kata ganti Tuhan <i>-Nya</i> dikapitalkan dan diberi tanda hubung.");
+Q("Sehari-hari",1,"Kakak saya ___ dokter, melainkan perawat.",["bukan","tidak","jangan","belum"],"<i>Bukan</i> menegasikan nomina; <i>tidak</i> menegasikan verba atau adjektiva.");
+Q("Sehari-hari",2,"Kalimat dengan kata depan yang tepat ialah ...",["Surat itu ditujukan kepada Kepala Sekolah.","Surat itu ditujukan pada Kepala Sekolah.","Surat itu ditujukan di Kepala Sekolah.","Surat itu ditujukan dari Kepala Sekolah."],"<i>Kepada</i> dipakai di depan nama orang atau jabatan.");
+Q("Sehari-hari",1,"Dalam surat resmi, kata tanya yang lebih baku ialah ...",["mengapa","kenapa","napa","knp"],"<i>Kenapa</i> berragam cakapan; <b>mengapa</b> lebih baku.");
+Q("Sehari-hari",1,"Saya lebih suka teh ___ kopi.",["daripada","dari","dengan","oleh"],"Perbandingan memakai <b>daripada</b>.");
+Q("Sehari-hari",2,"Kata ganti <i>kami</i> dipakai apabila ...",["pembicara dan pihaknya, tanpa melibatkan lawan bicara","pembicara beserta lawan bicara","yang dibicarakan lebih dari satu orang","menyapa satu orang"],"<i>Kami</i> bersifat eksklusif, <i>kita</i> inklusif.");
+Q("Sehari-hari",1,"Salam pembuka yang tepat dalam surat dinas ialah ...",["Dengan hormat,","Hai, apa kabar,","Halo bos,","Yth. teman-teman semua yaa,"],"Surat resmi dibuka dengan salam baku seperti <i>Dengan hormat</i>.");
+Q("Sehari-hari",1,"Saat hendak melintas di depan orang yang sedang duduk, ucapan yang sopan ialah ...",["Permisi","Selamat tinggal","Sampai jumpa","Silakan lewat sendiri"],"<b>Permisi</b> dipakai untuk meminta jalan.");
+
+/* ------------------------------ IMBUHAN ------------------------------ */
+Q("Imbuhan",1,"Bentuk berimbuhan yang benar dari kata dasar <i>ketik</i> ialah ...",["mengetik","menketik","mengketik","meketik"],"Awalan meng- + <i>ketik</i> = <b>mengetik</b>.");
+Q("Imbuhan",3,"Komputer itu digunakan untuk ___ data penelitian.",["memproses","memroses","memprosess","memproseskan"],"Pada gugus konsonan (<i>pr-</i>), /p/ tidak luluh: <b>memproses</b>.");
+Q("Imbuhan",3,"Guru meminta siswa ___ teori itu dalam percobaan.",["mempraktikkan","mempraktekkan","memraktikkan","mempraktikan"],"<b>Mempraktikkan</b> (praktik + -kan, konsonan k rangkap).");
+Q("Imbuhan",2,"Bentuk yang benar ialah ...",["diperbarui","diperbaharui","dibaharui","diperbaru"],"Baku: <b>memperbarui</b>, <b>diperbarui</b>.");
+Q("Imbuhan",3,"Perawat ___ pasien itu di kursi roda.",["mendudukkan","menduduki","mendudukan","mendudukki"],"<i>Mendudukkan</i> = membuat duduk; <i>menduduki</i> = menempati.");
+Q("Imbuhan",2,"Bentuk berimbuhan dari kata dasar <i>lihat</i> yang bermakna 'indra untuk melihat' ialah ...",["penglihatan","pelihatan","penlihatan","pelihat-an"],"peng- + <i>lihat</i> + -an = <b>penglihatan</b>.");
+Q("Imbuhan",3,"Orang yang membuat barang kerajinan disebut ...",["perajin","pengrajin","pengerajin","perrajin"],"Dalam KBBI: <b>perajin</b>.");
+
+/* ------------------------------ PERIBAHASA ------------------------------ */
+Q("Peribahasa",1,"Makna <i>besar pasak daripada tiang</i> ialah ...",["pengeluaran lebih besar daripada pendapatan","anak lebih pandai daripada orang tua","rumah besar bertiang kokoh","pekerjaan berat tetapi berhasil"],"Pasak lebih besar dari tiang: boros, belanja melebihi pendapatan.");
+Q("Peribahasa",2,"Makna <i>air beriak tanda tak dalam</i> ialah ...",["orang yang banyak bicara biasanya kurang berilmu","sungai dangkal sering banjir","bersuara lantang tanda berani","air tenang menghanyutkan"],"Orang yang sombong atau gaduh biasanya ilmunya dangkal.");
+Q("Peribahasa",2,"Makna <i>bagai pungguk merindukan bulan</i> ialah ...",["mengharapkan sesuatu yang mustahil dicapai","rindu kampung halaman","pasangan yang serasi","tekun menunggu hasil"],"Pungguk (burung hantu) mustahil menggapai bulan.");
+Q("Peribahasa",2,"Makna <i>lain lubuk lain ikannya</i> ialah ...",["lain tempat lain adat kebiasaannya","ikan di sungai lebih banyak","rezeki setiap orang sama","orang kaya berbeda kolam"],"Setiap daerah memiliki adat dan kebiasaan yang berbeda.");
+Q("Peribahasa",3,"Makna <i>gajah di pelupuk mata tidak tampak, kuman di seberang lautan tampak</i> ialah ...",["kesalahan sendiri tidak terlihat, kesalahan orang lain mudah terlihat","pandangan yang tajam","hewan besar mudah dikenali","kekayaan di luar negeri"],"Kritik terhadap orang lain terasa mudah, tetapi kesalahan sendiri luput.");
+Q("Peribahasa",3,"Makna <i>sekali merengkuh dayung, dua tiga pulau terlampaui</i> ialah ...",["sekali bekerja, beberapa tujuan tercapai","berlayar sendirian berbahaya","dayung yang patah","perjalanan jauh melelahkan"],"Satu usaha menghasilkan banyak manfaat.");
+Q("Peribahasa",2,"Makna <i>ada udang di balik batu</i> ialah ...",["ada maksud tersembunyi","penangkap udang berpengalaman","batu sungai yang bagus","udang enggan keluar"],"Di balik kebaikan seseorang terdapat maksud tertentu.");
+Q("Peribahasa",3,"Makna <i>bagai air di daun talas</i> ialah ...",["tidak berpendirian; mudah berubah pendapat","bersih dan murni","penuh kesabaran","mudah basah"],"Air di daun talas mudah bergoyang dan jatuh.");
+Q("Peribahasa",3,"Makna <i>seperti katak dalam tempurung</i> ialah ...",["berpandangan sempit karena kurang pengalaman","tinggal dalam kesulitan","pandai bersembunyi","suka berenang"],"Katak dalam tempurung mengira dunia hanya sebesar tempurungnya.");
+Q("Peribahasa",1,"Makna ungkapan <i>naik daun</i> ialah ...",["menjadi terkenal","naik ke pohon","bertambah tua","menghindar"],"<b>Naik daun</b>: menjadi populer.");
+Q("Peribahasa",1,"Makna ungkapan <i>meja hijau</i> ialah ...",["pengadilan","meja biliar","kantin","taman"],"<b>Meja hijau</b>: sidang atau lembaga pengadilan.");
+Q("Peribahasa",1,"Makna ungkapan <i>panjang tangan</i> ialah ...",["suka mencuri","berlengan panjang","suka menolong","pandai menulis"],"<b>Panjang tangan</b>: suka mencuri.");
+
+/* --------------------------- PADANAN ISTILAH --------------------------- */
+Q("Padanan Istilah",1,"Padanan <i>download</i> dalam bahasa Indonesia ialah ...",["unduh","unggah","tautan","pindai"],"<i>Download</i> = <b>unduh</b>.");
+Q("Padanan Istilah",1,"Padanan <i>upload</i> dalam bahasa Indonesia ialah ...",["unggah","unduh","gawai","daring"],"<i>Upload</i> = <b>unggah</b>.");
+Q("Padanan Istilah",1,"Padanan <i>online</i> ialah ...",["daring","luring","nirkabel","tautan"],"<i>Online</i> = <b>daring</b> (dalam jaringan).");
+Q("Padanan Istilah",2,"Padanan <i>offline</i> ialah ...",["luring","daring","unduh","nirkabel"],"<i>Offline</i> = <b>luring</b> (luar jaringan).");
+Q("Padanan Istilah",1,"Padanan <i>link</i> ialah ...",["tautan","pindai","gawai","swafoto"],"<i>Link</i> = <b>tautan</b>.");
+Q("Padanan Istilah",2,"Padanan <i>gadget</i> ialah ...",["gawai","gawang","gagas","gawat"],"<i>Gadget</i> = <b>gawai</b>.");
+Q("Padanan Istilah",2,"Padanan <i>deadline</i> ialah ...",["tenggat","tanggal","tangguh","tepat"],"<i>Deadline</i> = <b>tenggat</b> (batas waktu).");
+Q("Padanan Istilah",1,"Padanan <i>selfie</i> ialah ...",["swafoto","swasta","swalayan","swakarsa"],"<i>Selfie</i> = <b>swafoto</b>.");
+Q("Padanan Istilah",3,"Padanan resmi untuk <i>efektif</i> ialah ...",["mangkus","sangkil","lugas","gamblang"],"Padanan: <i>efektif</i> = <b>mangkus</b>, <i>efisien</i> = <b>sangkil</b>.");
+Q("Padanan Istilah",3,"Padanan resmi untuk <i>efisien</i> ialah ...",["sangkil","mangkus","tangkas","cermat"],"Padanan: <i>efisien</i> = <b>sangkil</b>, <i>efektif</i> = <b>mangkus</b>.");
+Q("Padanan Istilah",2,"Padanan <i>hacker</i> ialah ...",["peretas","penerobos","pencuri","pelacak"],"<i>Hacker</i> = <b>peretas</b>.");
+Q("Padanan Istilah",2,"Padanan <i>scan</i> ialah ...",["pindai","salin","ketik","cetak"],"<i>Scan</i> = <b>pindai</b>.");
+Q("Padanan Istilah",2,"Padanan <i>wireless</i> ialah ...",["nirkabel","nirlaba","daring","luring"],"<i>Wireless</i> = <b>nirkabel</b>.");
+Q("Padanan Istilah",3,"Bentuk serapan baku untuk <i>template</i> ialah ...",["templat","tempat","temple","tempel"],"<i>Template</i> diserap menjadi <b>templat</b>.");
+</script>
+
+<!-- ======================================================================
+  MESIN KUIS — umumnya tidak perlu diubah
+====================================================================== -->
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const LEVEL = { 1: "Mudah · Easy", 2: "Sedang · Medium", 3: "Sulit · Hard" };
+  const LEVEL_ID = { 1: "Mudah", 2: "Sedang", 3: "Sulit" };
+  const seen = new Set();
+  let sesi = [], idx = 0, skor = 0, jawaban = [], terkunci = false, nama = "";
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function pilihSoal() {
+    const { jumlahSoal, komposisi } = KONFIGURASI;
+    // soal yang belum pernah muncul diprioritaskan
+    const pool = shuffle(BANK.map((b, id) => ({ ...b, id })));
+    pool.sort((a, b) => seen.has(a.id) - seen.has(b.id));
+    const out = [];
+    [1, 2, 3].forEach(lv => {
+      out.push(...pool.filter(x => x.t === lv).slice(0, komposisi[lv] || 0));
+    });
+    if (out.length < jumlahSoal) {
+      const ids = new Set(out.map(x => x.id));
+      out.push(...pool.filter(x => !ids.has(x.id)).slice(0, jumlahSoal - out.length));
+    }
+    const hasil = shuffle(out).slice(0, jumlahSoal);
+    hasil.forEach(x => seen.add(x.id));
+    return hasil;
+  }
+
+  function tampil(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    $("#" + id).classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function mulai() {
+    nama = $("#nama").value.trim();
+    sesi = pilihSoal().map(s => ({
+      ...s,
+      opsi: shuffle(s.o.map((t, i) => ({ t, ok: i === 0 })))
+    }));
+    idx = 0; skor = 0; jawaban = [];
+    tampil("quiz");
+    render();
+  }
+
+  function render() {
+    const s = sesi[idx];
+    terkunci = false;
+    $("#no").textContent = idx + 1;
+    $("#total").textContent = sesi.length;
+    $("#bar").style.width = (idx / sesi.length * 100) + "%";
+    $("#kat").textContent = s.k;
+    $("#lvl").textContent = LEVEL[s.t] || "";
+    $("#soal").innerHTML = s.q;
+    const box = $("#opsi");
+    box.innerHTML = "";
+    s.opsi.forEach((o, i) => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.innerHTML = `<span class="ltr">${"ABCD"[i]}</span><span class="txt">${o.t}</span>`;
+      b.addEventListener("click", () => pilih(i));
+      box.appendChild(b);
+    });
+    $("#fb").hidden = true;
+    $("#nextrow").hidden = true;
+  }
+
+  function pilih(i) {
+    if (terkunci) return;
+    terkunci = true;
+    const s = sesi[idx];
+    const benar = s.opsi[i].ok;
+    if (benar) skor++;
+    jawaban.push({ pilih: i, benar });
+    [...$("#opsi").children].forEach((b, n) => {
+      b.disabled = true;
+      if (s.opsi[n].ok) b.classList.add("ok");
+      else if (n === i) b.classList.add("no");
+      else b.classList.add("dim");
+    });
+    const fb = $("#fb");
+    fb.className = "fb " + (benar ? "good" : "bad");
+    $("#fbJudul").innerHTML = benar
+      ? 'Tepat! <span class="en">Correct.</span>'
+      : 'Kurang tepat. <span class="en">Not quite.</span>';
+    $("#fbIsi").innerHTML = KONFIGURASI.tampilkanPembahasan ? (s.e || "") : "";
+    fb.hidden = !(KONFIGURASI.tampilkanPembahasan && s.e) && true;
+    if (!fb.hidden === false && !KONFIGURASI.tampilkanPembahasan) fb.hidden = true;
+    // selalu tampilkan status benar/salah
+    if (!KONFIGURASI.tampilkanPembahasan || !s.e) { fb.hidden = false; $("#fbIsi").hidden = true; } else { $("#fbIsi").hidden = false; }
+    const terakhir = idx === sesi.length - 1;
+    $("#lanjut").innerHTML = terakhir
+      ? "Lihat Hasil<small>See Results</small>"
+      : "Lanjut<small>Next</small>";
+    $("#nextrow").hidden = false;
+    $("#lanjut").focus({ preventScroll: true });
+  }
+
+  function lanjut() {
+    idx++;
+    if (idx >= sesi.length) hasil(); else render();
+  }
+
+  function peringkat(n) {
+    if (n >= 90) return ["Pujangga Bahasa", "Language Laureate"];
+    if (n >= 75) return ["Penutur Mahir", "Skilled Speaker"];
+    if (n >= 60) return ["Penutur Cakap", "Competent Speaker"];
+    if (n >= 40) return ["Pembelajar Tekun", "Diligent Learner"];
+    return ["Penjelajah Bahasa", "Language Explorer"];
+  }
+
+  let hasilData = null;
+  function hasil() {
+    const nilai = Math.round(skor / sesi.length * 100);
+    const [pid, pen] = peringkat(nilai);
+    const perKat = {};
+    sesi.forEach((s, i) => {
+      perKat[s.k] = perKat[s.k] || [0, 0];
+      perKat[s.k][1]++;
+      if (jawaban[i].benar) perKat[s.k][0]++;
+    });
+    hasilData = { nilai, pid, pen };
+    tampil("result");
+    $("#bar").style.width = "100%";
+    $("#atasNama").hidden = !nama;
+    $("#atasNama").textContent = nama ? `Atas nama ${nama}` : "";
+    $("#peringkat").textContent = pid;
+    $("#peringkatEn").textContent = pen;
+    $("#benar").innerHTML = `<b>${skor}</b> dari <b>${sesi.length}</b> jawaban benar<small class="en">${skor} of ${sesi.length} answers correct</small>`;
+    $("#rincian").innerHTML = Object.entries(perKat)
+      .map(([k, v]) => `<span class="chip">${k} <em>${v[0]}/${v[1]}</em></span>`).join("");
+    // hitung naik
+    const el = $("#nilai"); let n = 0;
+    const step = Math.max(1, Math.ceil(nilai / 40));
+    el.textContent = "0";
+    const t = setInterval(() => { n = Math.min(nilai, n + step); el.textContent = n; if (n >= nilai) clearInterval(t); }, 25);
+    // tinjauan
+    $("#review").hidden = true;
+    $("#review").innerHTML = sesi.map((s, i) => {
+      const j = jawaban[i], benar = s.opsi.find(o => o.ok).t, dipilih = s.opsi[j.pilih].t;
+      return `<div class="ri">
+        <p class="q"><span class="mk ${j.benar ? "g" : "r"}">${i + 1}. ${j.benar ? "✓" : "✗"}</span> ${s.q}</p>
+        <p><b>Jawaban Anda:</b> ${dipilih}</p>
+        ${j.benar ? "" : `<p><b>Jawaban benar:</b> ${benar}</p>`}
+        <p class="en" style="font-size:1.05rem">${s.k} · ${LEVEL_ID[s.t] || ""}${s.e ? " — " + s.e : ""}</p>
+      </div>`;
+    }).join("");
+  }
+
+  /* ---------- simpan hasil sebagai gambar (PNG) ---------- */
+  async function simpanGambar() {
+    const RED = "#9e1b24", REDD = "#6e0f17", MUTE = "#7a6467", INK = "#2b1a1c";
+    try {
+      await Promise.all([
+        document.fonts.load('900 66px "Playfair Display"'),
+        document.fonts.load('700 54px "Playfair Display"'),
+        document.fonts.load('italic 400 30px "Cormorant Garamond"'),
+        document.fonts.load('500 30px "Inter"'),
+        document.fonts.load('600 28px "Inter"')
+      ]);
+    } catch (e) {}
+    const W = 1080, H = 1400;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const SER = '"Playfair Display", Georgia, serif';
+    const ITA = '"Cormorant Garamond", Georgia, serif';
+    const SAN = 'Inter, system-ui, sans-serif';
+    const ct = (txt, y, font, color, ls = 0) => {
+      x.font = font; x.fillStyle = color; x.textAlign = "center"; x.textBaseline = "alphabetic";
+      if ("letterSpacing" in x) x.letterSpacing = ls + "px";
+      x.fillText(txt, W / 2 + ls / 2, y);
+      if ("letterSpacing" in x) x.letterSpacing = "0px";
+    };
+    // latar
+    x.fillStyle = "#fffdfc"; x.fillRect(0, 0, W, H);
+    x.fillStyle = RED; x.fillRect(0, 0, W, 26);
+    x.strokeStyle = RED; x.lineWidth = 3; x.strokeRect(48, 64, W - 96, H - 128);
+    x.lineWidth = 1; x.strokeRect(62, 78, W - 124, H - 156);
+    // kepala
+    ct("WARTA_KATA", 168, `600 24px ${SAN}`, RED, 14);
+    ct("Kuis Bahasa Indonesia", 262, `900 66px ${SER}`, RED);
+    ct("The Indonesian Language Proficiency Challenge", 312, `italic 400 32px ${ITA}`, MUTE);
+    // ornamen
+    x.strokeStyle = RED; x.lineWidth = 1.5;
+    x.beginPath(); x.moveTo(330, 358); x.lineTo(500, 358); x.moveTo(580, 358); x.lineTo(750, 358); x.stroke();
+    x.fillStyle = RED; x.save(); x.translate(W / 2, 358); x.rotate(Math.PI / 4); x.fillRect(-8, -8, 16, 16); x.restore();
+    // nama
+    if (nama) {
+      ct("ATAS NAMA", 428, `500 20px ${SAN}`, MUTE, 8);
+      ct(nama, 492, `700 50px ${SER}`, INK);
+    }
+    // lingkaran skor
+    const cy = 690;
+    x.beginPath(); x.arc(W / 2, cy, 172, 0, Math.PI * 2); x.fillStyle = RED; x.fill();
+    x.beginPath(); x.arc(W / 2, cy, 154, 0, Math.PI * 2); x.strokeStyle = "#fff"; x.lineWidth = 3; x.stroke();
+    ct(String(hasilData.nilai), cy + 36, `900 150px ${SER}`, "#fff");
+    ct("DARI 100 · OUT OF 100", cy + 100, `500 19px ${SAN}`, "#fff", 4);
+    // peringkat
+    ct(hasilData.pid, 950, `700 56px ${SER}`, REDD);
+    ct(hasilData.pen, 996, `italic 400 34px ${ITA}`, MUTE);
+    ct(`${skor} dari ${sesi.length} jawaban benar`, 1072, `500 32px ${SAN}`, INK);
+    ct(`${skor} of ${sesi.length} answers correct`, 1110, `italic 400 28px ${ITA}`, MUTE);
+    const tgl = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    ct(tgl, 1166, `400 22px ${SAN}`, MUTE, 2);
+    // penutup
+    x.strokeStyle = RED; x.globalAlpha = .4; x.beginPath(); x.moveTo(300, 1202); x.lineTo(780, 1202); x.stroke(); x.globalAlpha = 1;
+    ct("Oleh WARTA_KATA", 1256, `600 30px ${SAN}`, REDD, 6);
+    ct("#cintabahasaindonesia", 1306, `600 32px ${SAN}`, RED, 1);
+    c.toBlob(b => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(b);
+      a.download = "hasil-kuis-bahasa-indonesia.png";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }, "image/png");
+  }
+
+  /* ---------- pemasangan ---------- */
+  $("#jml").textContent = KONFIGURASI.jumlahSoal;
+  $("#mulai").addEventListener("click", mulai);
+  $("#lanjut").addEventListener("click", lanjut);
+  $("#simpan").addEventListener("click", simpanGambar);
+  $("#ulang").addEventListener("click", () => { tampil("start"); });
+  $("#tinjau").addEventListener("click", () => { const r = $("#review"); r.hidden = !r.hidden; if (!r.hidden) r.scrollIntoView({ behavior: "smooth" }); });
+  $("#nama").addEventListener("keydown", e => { if (e.key === "Enter") mulai(); });
+
+  document.addEventListener("keydown", e => {
+    if (!$("#quiz").classList.contains("active")) return;
+    const k = e.key.toLowerCase();
+    const map = { a: 0, b: 1, c: 2, d: 3, 1: 0, 2: 1, 3: 2, 4: 3 };
+    if (!terkunci && k in map) pilih(map[k]);
+    else if (terkunci && (e.key === "Enter" || e.key === "ArrowRight")) { e.preventDefault(); lanjut(); }
+  });
+})();
+</script>
+</body>
+</html>
